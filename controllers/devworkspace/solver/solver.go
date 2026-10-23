@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/devfile/devworkspace-operator/pkg/constants"
-	"github.com/eclipse-che/che-operator/pkg/deploy"
+	"github.com/eclipse-che/che-operator/pkg/common"
 	"github.com/eclipse-che/che-operator/pkg/provision/clientwrapper"
 
 	controllerv1alpha1 "github.com/devfile/devworkspace-operator/apis/controller/v1alpha1"
@@ -159,7 +159,7 @@ func isSupported(routingClass controllerv1alpha1.DevWorkspaceRoutingClass) bool 
 }
 
 func (c *CheRoutingSolver) getCheClusterReady() (*chev2.CheCluster, error) {
-	cheCluster, err := deploy.FindCheClusterCRInNamespace(c.client, "")
+	cheCluster, err := common.CheCluster.FindSingleton(context.TODO(), c.client, "")
 	if err != nil {
 		return nil, err
 	}
