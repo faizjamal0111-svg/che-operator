@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"github.com/eclipse-che/che-operator/controllers/namespacecache"
-	"github.com/eclipse-che/che-operator/pkg/common"
+	"github.com/eclipse-che/che-operator/pkg/provision/resources"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 
@@ -161,7 +161,7 @@ func (r *WorkspacesConfigReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, nil
 	}
 
-	checluster, err := common.CheCluster.FindSingleton(ctx, r.client, "")
+	checluster, err := resources.CheCluster.FindSingleton(ctx, r.client, "")
 	if err != nil || checluster == nil {
 		return ctrl.Result{}, err
 	}
@@ -209,7 +209,7 @@ func (r *WorkspacesConfigReconciler) watchRules(
 						// reconcile rule when workspace config is modified in a che namespace
 						// to update the config in all users` namespaces
 						Check: func(o metav1.Object) bool {
-							cheCluster, _ := common.CheCluster.FindSingleton(ctx, r.client, o.GetNamespace())
+							cheCluster, _ := resources.CheCluster.FindSingleton(ctx, r.client, o.GetNamespace())
 							return hasWSConfigComponentLabels(o) && cheCluster != nil
 						},
 						Namespaces: func(o metav1.Object) []string { return r.namespaceCache.GetAllKnownNamespaces() },

@@ -17,12 +17,12 @@ import (
 	"time"
 
 	chev2 "github.com/eclipse-che/che-operator/api/v2"
-	"github.com/eclipse-che/che-operator/pkg/common"
 	"github.com/eclipse-che/che-operator/pkg/common/chetypes"
 	"github.com/eclipse-che/che-operator/pkg/common/constants"
 	defaults "github.com/eclipse-che/che-operator/pkg/common/operator-defaults"
 	"github.com/eclipse-che/che-operator/pkg/common/reconciler"
 	"github.com/eclipse-che/che-operator/pkg/deploy"
+	"github.com/eclipse-che/che-operator/pkg/provision/resources"
 	"github.com/sirupsen/logrus"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -120,7 +120,7 @@ func (s *CheServerReconciler) syncActiveChePhase(cheCtx *chetypes.CheContext) (b
 		cheCtx.CheCluster.Status.ChePhase = chev2.ClusterPhaseInactive
 	}
 
-	err = common.CheCluster.UpdateStatus(cheCtx)
+	err = resources.CheCluster.UpdateStatus(cheCtx)
 	return err == nil, err
 }
 
@@ -135,7 +135,7 @@ func (s *CheServerReconciler) syncDeployment(cheCtx *chetypes.CheContext) (bool,
 
 func (s CheServerReconciler) syncCheVersion(cheCtx *chetypes.CheContext) (bool, error) {
 	cheCtx.CheCluster.Status.CheVersion = defaults.GetCheVersion()
-	err := common.CheCluster.UpdateStatus(cheCtx)
+	err := resources.CheCluster.UpdateStatus(cheCtx)
 	return err == nil, err
 }
 
@@ -147,6 +147,6 @@ func (s CheServerReconciler) syncCheURL(cheCtx *chetypes.CheContext) (bool, erro
 	}
 
 	cheCtx.CheCluster.Status.CheURL = expectedCheUrl
-	err := common.CheCluster.UpdateStatus(cheCtx)
+	err := resources.CheCluster.UpdateStatus(cheCtx)
 	return err == nil, err
 }

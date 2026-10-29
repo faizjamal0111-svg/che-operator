@@ -15,12 +15,12 @@ package openvsx_server
 import (
 	"fmt"
 
-	"github.com/eclipse-che/che-operator/pkg/common"
 	"github.com/eclipse-che/che-operator/pkg/common/chetypes"
 	"github.com/eclipse-che/che-operator/pkg/common/constants"
 	"github.com/eclipse-che/che-operator/pkg/deploy/expose"
 	"github.com/eclipse-che/che-operator/pkg/deploy/gateway"
 	"github.com/eclipse-che/che-operator/pkg/deploy/openvsx"
+	"github.com/eclipse-che/che-operator/pkg/provision/resources"
 )
 
 func (r *OpenVSXServerReconciler) exposeEndpoint(cheCtx *chetypes.CheContext) (string, bool, error) {
@@ -50,7 +50,7 @@ func (r *OpenVSXServerReconciler) syncOpenVSXURLStatus(cheCtx *chetypes.CheConte
 	if openVSXURL != cheCtx.CheCluster.Status.OpenVSXURL {
 		cheCtx.CheCluster.Status.OpenVSXURL = openVSXURL
 
-		if err := common.CheCluster.UpdateStatus(cheCtx); err != nil {
+		if err := resources.CheCluster.UpdateStatus(cheCtx); err != nil {
 			return fmt.Errorf("failed to update status for OpenVSXURL: %w", err)
 		}
 	}

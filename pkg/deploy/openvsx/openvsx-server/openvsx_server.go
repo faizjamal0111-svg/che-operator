@@ -16,11 +16,11 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/eclipse-che/che-operator/pkg/common"
 	"github.com/eclipse-che/che-operator/pkg/common/chetypes"
 	"github.com/eclipse-che/che-operator/pkg/common/constants"
 	"github.com/eclipse-che/che-operator/pkg/common/reconciler"
 	"github.com/eclipse-che/che-operator/pkg/deploy/gateway"
+	"github.com/eclipse-che/che-operator/pkg/provision/resources"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -195,7 +195,7 @@ func deleteResources(cheCtx *chetypes.CheContext) {
 	}
 
 	cheCtx.CheCluster.Status.OpenVSXURL = ""
-	if err := common.CheCluster.UpdateStatus(cheCtx); err != nil {
+	if err := resources.CheCluster.UpdateStatus(cheCtx); err != nil {
 		logger.Error(err, "Failed to update status for OpenVSXURL")
 	}
 }

@@ -15,8 +15,8 @@ package che
 import (
 	"context"
 
-	"github.com/eclipse-che/che-operator/pkg/common"
 	"github.com/eclipse-che/che-operator/pkg/common/constants"
+	"github.com/eclipse-che/che-operator/pkg/provision/resources"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -29,7 +29,7 @@ func IsTrustedBundleConfigMap(cl client.Client, watchNamespace string, obj clien
 		return false, ctrl.Request{}
 	}
 
-	checluster, _ := common.CheCluster.FindSingleton(context.TODO(), cl, watchNamespace)
+	checluster, _ := resources.CheCluster.FindSingleton(context.TODO(), cl, watchNamespace)
 	if checluster == nil {
 		return false, ctrl.Request{}
 	}
@@ -68,7 +68,7 @@ func IsEclipseCheRelatedObj(cl client.Client, watchNamespace string, obj client.
 		return false, ctrl.Request{}
 	}
 
-	checluster, _ := common.CheCluster.FindSingleton(context.TODO(), cl, watchNamespace)
+	checluster, _ := resources.CheCluster.FindSingleton(context.TODO(), cl, watchNamespace)
 	if checluster == nil {
 		return false, ctrl.Request{}
 	}

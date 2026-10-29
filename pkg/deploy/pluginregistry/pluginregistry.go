@@ -16,10 +16,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/eclipse-che/che-operator/pkg/common"
 	"github.com/eclipse-che/che-operator/pkg/common/diffs"
 	"github.com/eclipse-che/che-operator/pkg/common/reconciler"
 	"github.com/eclipse-che/che-operator/pkg/provision/clientwrapper"
+	"github.com/eclipse-che/che-operator/pkg/provision/resources"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -63,7 +63,7 @@ func (p *PluginRegistryReconciler) Reconcile(cheCtx *chetypes.CheContext) (recon
 		}
 
 		cheCtx.CheCluster.Status.PluginRegistryURL = ""
-		err := common.CheCluster.UpdateStatus(cheCtx)
+		err := resources.CheCluster.UpdateStatus(cheCtx)
 		return reconcile.Result{}, err == nil, err
 	}
 
@@ -159,7 +159,7 @@ func (p *PluginRegistryReconciler) updateStatus(endpoint string, cheCtx *chetype
 	}
 
 	cheCtx.CheCluster.Status.PluginRegistryURL = pluginRegistryURL
-	if err := common.CheCluster.UpdateStatus(cheCtx); err != nil {
+	if err := resources.CheCluster.UpdateStatus(cheCtx); err != nil {
 		return false, err
 	}
 

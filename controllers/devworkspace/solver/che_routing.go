@@ -20,8 +20,8 @@ import (
 	"strings"
 
 	dw "github.com/devfile/api/v2/pkg/apis/workspaces/v1alpha2"
-	"github.com/eclipse-che/che-operator/pkg/common"
 	"github.com/eclipse-che/che-operator/pkg/provision/clientwrapper"
+	"github.com/eclipse-che/che-operator/pkg/provision/resources"
 
 	"github.com/eclipse-che/che-operator/pkg/common/constants"
 	defaults "github.com/eclipse-che/che-operator/pkg/common/operator-defaults"
@@ -789,7 +789,7 @@ func (c *CheRoutingSolver) cheRoutingFinalize(routing *dwo.DevWorkspaceRouting) 
 		return err
 	}
 
-	cheCluster, err := common.CheCluster.FindSingleton(context.TODO(), c.client, "")
+	cheCluster, err := resources.CheCluster.FindSingleton(context.TODO(), c.client, "")
 	if err != nil {
 		return err
 	}
