@@ -21,6 +21,7 @@ import (
 	"github.com/eclipse-che/che-operator/pkg/common/reconciler"
 	agentsandbox "github.com/eclipse-che/che-operator/pkg/deploy/agent-sandbox"
 	"github.com/eclipse-che/che-operator/pkg/deploy/metrics"
+	"github.com/eclipse-che/che-operator/pkg/deploy/rbac"
 	"github.com/eclipse-che/che-operator/pkg/provision/clientwrapper"
 	"github.com/eclipse-che/che-operator/pkg/reconciler/networkpolicy"
 	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -50,7 +51,6 @@ import (
 	openvsxserver "github.com/eclipse-che/che-operator/pkg/deploy/openvsx/openvsx-server"
 	"github.com/eclipse-che/che-operator/pkg/deploy/pluginregistry"
 	"github.com/eclipse-che/che-operator/pkg/deploy/postgres"
-	"github.com/eclipse-che/che-operator/pkg/deploy/rbac"
 	"github.com/eclipse-che/che-operator/pkg/deploy/server"
 	"github.com/eclipse-che/che-operator/pkg/deploy/tls"
 
@@ -105,15 +105,19 @@ func NewReconciler(
 	reconcilerManager.AddReconciler(migration.NewMigrator())
 	reconcilerManager.AddReconciler(migration.NewCheClusterDefaultsCleaner())
 	reconcilerManager.AddReconciler(NewCheClusterValidator())
-	reconcilerManager.AddReconciler(tls.NewCertificatesReconciler())
-	reconcilerManager.AddReconciler(tls.NewTlsSecretReconciler())
-	reconcilerManager.AddReconciler(devworkspace.NewDevWorkspaceConfigReconciler())
-	reconcilerManager.AddReconciler(rbac.NewGatewayPermissionsReconciler())
-	reconcilerManager.AddReconciler(&networkpolicy.NetworkPoliciesReconciler{})
 
 	// we have to expose che endpoint independently of syncing other server
 	// resources since che host is used for dashboard deployment and che config map
 	reconcilerManager.AddReconciler(server.NewCheHostReconciler())
+	// detect whether a self-signed certificate is used right after the che endpoint
+	// is exposed since the che route/ingress is used to get the certificates chain
+	reconcilerManager.AddReconciler(tls.NewSelfSignedCertificateReconciler())
+
+	reconcilerManager.AddReconciler(devworkspace.NewDevWorkspaceConfigReconciler())
+	reconcilerManager.AddReconciler(rbac.NewGatewayPermissionsReconciler())
+	reconcilerManager.AddReconciler(&networkpolicy.NetworkPoliciesReconciler{})
+	reconcilerManager.AddReconciler(tls.NewCertificatesReconciler())
+	reconcilerManager.AddReconciler(tls.NewTlsSecretReconciler())
 	reconcilerManager.AddReconciler(server.NewBaseDomainReconciler())
 	reconcilerManager.AddReconciler(postgres.NewPostgresReconciler())
 	if infrastructure.IsOpenShiftOAuthEnabled() {
@@ -268,13 +272,6 @@ func (r *CheClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if cheCtx.DWONamespace == "" {
 		r.Log.Info("DevWorkspaceOperator namespace not found, requeuing.")
 		return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
-	}
-
-	// Detect whether self-signed certificate is used
-	cheCtx.IsSelfSignedCertificate, err = tls.IsSelfSignedCertificateUsed(cheCtx)
-	if err != nil {
-		r.Log.Error(err, "Failed to detect if self-signed certificate used.")
-		return ctrl.Result{}, err
 	}
 
 	if cheCtx.CheCluster.DeletionTimestamp.IsZero() {
